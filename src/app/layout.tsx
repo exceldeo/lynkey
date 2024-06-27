@@ -9,10 +9,10 @@ export const metadata: Metadata = {
   description: "Amadea Cornelia | Parenting Anak",
   icons: [
     {
-      href: "/image/photo_profile",
+      href: "/image/photo_profile.jpg",
       sizes: "32x32",
       type: "image/x-icon",
-      url: "/image/photo_profile", // Add the missing 'url' property
+      url: "/image/photo_profile.jpg", // Add the missing 'url' property
     },
   ],
 };
