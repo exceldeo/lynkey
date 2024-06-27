@@ -170,8 +170,8 @@ export default function Home() {
                   rel="noreferrer"
                   key={idx}
                 >
-                  <Card className="p-3 flex flex-col space-y-1 h-48">
-                    <div className="w-[100%] flex justify-center border border-red-950 overflow-hidden h-48">
+                  <Card className="p-3 flex flex-col space-y-1 h-52">
+                    <div className="w-[100%] flex justify-center border border-red-950 overflow-hidden ">
                       <Image
                         src={
                           product.link_image
@@ -186,11 +186,11 @@ export default function Home() {
                         alt={product.nama_product}
                         width={240}
                         height={240}
-                        className="max-h-48 overflow-hidden "
+                        className=" h-36 w-36 overflow-hidden "
                       />
                     </div>
                     <CardTitle
-                      className="text-lg font-semibold overflow-hidden overflow-ellipsis line-clamp-2"
+                      className="text-lg font-semibold overflow-auto overflow-ellipsis line-clamp-2"
                       title={product.nama_product}
                     >
                       {product.nama_product}
