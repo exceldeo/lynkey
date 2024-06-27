@@ -90,7 +90,7 @@ export default function Home() {
 
   return (
     <div className="bg-slate-100">
-      <main className="bg-white max-w-xl mx-auto dark:bg-slate-800 min-h-screen relative pt-5 px-5">
+      <main className="bg-white max-w-sm mx-auto dark:bg-slate-800 min-h-screen relative pt-5 px-5">
         <a
           href="https://www.instagram.com/amadeacornelia/"
           target="_blank"
@@ -170,8 +170,8 @@ export default function Home() {
                   rel="noreferrer"
                   key={idx}
                 >
-                  <Card className="p-3 flex flex-col space-y-1 h-80">
-                    <div className="w-[100%] flex justify-center border border-red-950 overflow-hidden h-60">
+                  <Card className="p-3 flex flex-col space-y-1 h-48">
+                    <div className="w-[100%] flex justify-center border border-red-950 overflow-hidden h-48">
                       <Image
                         src={
                           product.link_image
@@ -186,7 +186,7 @@ export default function Home() {
                         alt={product.nama_product}
                         width={240}
                         height={240}
-                        className="max-h-60 overflow-hidden "
+                        className="max-h-48 overflow-hidden "
                       />
                     </div>
                     <CardTitle
