@@ -1,113 +1,211 @@
+"use client";
+
+import SearchBar from "@/components/SearchBar";
+import { Badge } from "@/components/ui/badge";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import axios from "axios";
+import { Link } from "lucide-react";
 import Image from "next/image";
+import { useEffect, useState } from "react";
 
 export default function Home() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+
+  const [isLoadingProducts, setIsLoadingProducts] = useState(true);
+  const [isLoadingCategories, setIsLoadingCategories] = useState(true);
+
+  const [error, setError] = useState<string>("");
+
+  const [filterCategory, setFilterCategory] = useState<string>("0");
+
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    async function fetchCategories() {
+      await fetch(
+        "https://script.google.com/macros/s/AKfycbxAyItD6xeSWmvjdYXEirqZ6krkgJVES9RyuC3Km9oOud80cHubac-YB8RHBt5umMs_/exec?path=categories"
+      )
+        .then((response) => response.json())
+        .then((data) => {
+          console.log(data.data);
+          setCategories(data.data);
+          setIsLoadingCategories(false);
+        });
+    }
+    async function fetchProducts() {
+      await fetch(
+        "https://script.google.com/macros/s/AKfycbxAyItD6xeSWmvjdYXEirqZ6krkgJVES9RyuC3Km9oOud80cHubac-YB8RHBt5umMs_/exec?path=products"
+      )
+        .then((response) => response.json())
+        .then((data) => {
+          console.log(data.data);
+          setProducts(data.data);
+          setFilteredProducts(data.data);
+          setIsLoadingProducts(false);
+        });
+    }
+
+    fetchCategories();
+    fetchProducts();
+  }, []);
+
+  const handleSearch = (query: string) => {
+    setError("");
+    if (query === "") {
+      setFilteredProducts(products);
+      return;
+    }
+    if (query.length < 3) {
+      setError("Keyword must be at least 3 characters long");
+      return;
+    }
+    const filtered = products.filter((product) =>
+      product.nama_product.toLowerCase().includes(query.toLowerCase())
+    );
+    setFilteredProducts(filtered);
+    console.log(filtered);
+  };
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const isScrolled = window.scrollY > 170;
+      console.log(window.scrollY);
+      setIsScrolled(isScrolled);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">src/app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:size-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+    <div className="bg-slate-100">
+      <main className="bg-white max-w-xl mx-auto dark:bg-slate-800 min-h-screen relative pt-5 px-5">
+        <a
+          href="https://www.instagram.com/amadeacornelia/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <div className="grid grid-cols-4 gap-4 p-5 bg-glass backdrop-blur shadow-glass rounded-2xl">
+            <div className="flex">
+              <Image
+                src="/image/photo_profile.jpg" // replace with your image path
+                alt="Profile picture"
+                width={100}
+                height={100}
+                className="rounded-full"
+              />
+            </div>
+            <div className="flex flex-col col-span-3">
+              <h2 className="mt-4 text-2xl font-bold">amadeacornelia</h2>
+              {/* <p className="text-gray-500">
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec
+              bibendum, libero nec ultricies ultricies, nunc nisl aliquet justo,
+              nec tincidunt purus turpis sit amet eros.
+            </p> */}
+            </div>
+          </div>
+        </a>
+
+        <div
+          className={`sticky top-0 z-10 pt-5 ${isScrolled ? "bg-white" : ""}`}
+        >
+          <div className="flex flex-col">
+            <SearchBar onSearch={handleSearch} />
+            {error && <p className="text-red-500 mt-1 px-1 text-sm">{error}</p>}
+          </div>
+
+          <div className="flex overflow-x-auto py-2 mb-4">
+            {!isLoadingCategories &&
+              [{ category_name: "All", ID: "0" }, ...categories].map(
+                (category, idx) => (
+                  <Badge
+                    key={idx}
+                    className="mr-2 flex whitespace-nowrap"
+                    onClick={() => {
+                      if ("ID" in category) {
+                        setFilterCategory(category.ID);
+                        if (category.ID === "0") {
+                          setFilteredProducts(products);
+                        } else {
+                          setFilteredProducts(
+                            products.filter(
+                              (product) => product.category_id === category.ID
+                            )
+                          );
+                        }
+                      }
+                    }}
+                    variant={
+                      filterCategory ===
+                      (category as { category_name: string; ID: string }).ID
+                        ? "defaultYellow"
+                        : "outline"
+                    }
+                  >
+                    {category.category_name}
+                  </Badge>
+                )
+              )}
+          </div>
         </div>
-      </div>
 
-      <div className="relative z-[-1] flex place-items-center before:absolute before:h-[300px] before:w-full before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 sm:before:w-[480px] sm:after:w-[240px] before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className="mb-32 grid text-center lg:mb-0 lg:w-full lg:max-w-5xl lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Templates{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Explore starter templates for Next.js.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Deploy{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-balance text-sm opacity-50">
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
+        <div className="grid grid-cols-2 gap-1 mt-5">
+          {!isLoadingProducts ? (
+            filteredProducts.map((product, idx) => {
+              return (
+                <a
+                  href={product.link_product}
+                  target="_blank"
+                  rel="noreferrer"
+                  key={idx}
+                >
+                  <Card className="p-3 flex flex-col space-y-1 h-80">
+                    <div className="w-[100%] flex justify-center border border-red-950 overflow-hidden h-60">
+                      <Image
+                        src={
+                          product.link_image
+                            ? `https://drive.usercontent.google.com/download?id=${product.link_image
+                                .replace("https://drive.google.com/file/d/", "")
+                                .replace(
+                                  "/view?usp=sharing",
+                                  ""
+                                )}&export=view&authuser=0`
+                            : "/image/photo_profile.jpg"
+                        } // replace with your image path
+                        alt={product.nama_product}
+                        width={240}
+                        height={240}
+                        className="max-h-60 overflow-hidden "
+                      />
+                    </div>
+                    <CardTitle
+                      className="text-lg font-semibold overflow-hidden overflow-ellipsis line-clamp-2"
+                      title={product.nama_product}
+                    >
+                      {product.nama_product}
+                    </CardTitle>
+                  </Card>
+                </a>
+              );
+            })
+          ) : (
+            <div className="col-span-2">
+              <p className="text-center text-gray-500">Loading...</p>
+            </div>
+          )}
+        </div>
+      </main>
+    </div>
   );
 }
