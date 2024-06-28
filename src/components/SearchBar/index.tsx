@@ -25,7 +25,7 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
         value={query}
         onChange={handleInputChange}
         placeholder="Search..."
-        className="p-3 rounded-3xl shadow-sm border-gray-500 dark:border-gray-700 dark:bg-slate-700 dark:text-white border-2 pr-7"
+        className="p-3 rounded-3xl shadow-sm border-gray-500 dark:border-gray-700 dark:bg-slate-700 dark:text-white border-1 pr-7"
       />
       {query && (
         <div

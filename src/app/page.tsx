@@ -170,8 +170,8 @@ export default function Home() {
                   rel="noreferrer"
                   key={idx}
                 >
-                  <Card className="p-3 flex flex-col space-y-1 h-52">
-                    <div className="w-[100%] flex justify-center border border-red-950 overflow-hidden ">
+                  <div className="p-3 flex flex-col space-y-1 h-52 border-1 border">
+                    <div className="w-[100%] flex justify-center overflow-hidden ">
                       <Image
                         src={
                           product.link_image
@@ -195,7 +195,7 @@ export default function Home() {
                     >
                       {product.nama_product}
                     </CardTitle>
-                  </Card>
+                  </div>
                 </a>
               );
             })
